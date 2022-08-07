@@ -1,9 +1,11 @@
 ﻿using BlockbusterAPI.DTOs;
 using BlockbusterAPI.Entities;
 using BlockbusterAPI.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace BlockbusterAPI.Controllers
 {
     [ApiController]
     [Route("/blockbuster/v1/users")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         readonly IUserRepository repository;
 
@@ -59,6 +61,8 @@ namespace BlockbusterAPI.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ConflictMessageErrorDto), StatusCodes.Status409Conflict)]
         public async Task<ActionResult<UserDto>> CreateUserAsync (CreateUserDto userDto)
         {
             int existingUser = await AlreadyExistsEmailOrUsername(userDto.Email, userDto.Username);
@@ -98,6 +102,7 @@ namespace BlockbusterAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
             var user = await GetUserAsync(id);
@@ -111,6 +116,7 @@ namespace BlockbusterAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> UpdateUserAsync (Guid id, UpdateUserDto updateUser)
         {
             var existingUser = await repository.GetUserAsync(id);
