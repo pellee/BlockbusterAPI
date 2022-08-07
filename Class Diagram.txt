@@ -1,16 +1,64 @@
+User
+id - guid
+name - string
+lastname - string
+username - string
+email - string
+
+
+Movies
+id - guid
+name - string
+genre - string
+duration - integer
+shortDescription - string 
+longDescription - string
+cast - array of string
+
+
+Tv Shows
+id - guid
+name - string
+duration - integer
+shortDescription - string
+longDescription - string
+episodes - array of objet
+cast - array of string
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
 User:
-id - 
-name - 
-lastname - 
-username - 
-email -
+id - guid
+name - string
+lastname - string
+username - string
+email - string
 
+Film:
+name - string
+genre - string
+duration - integer
+year - int
+cast - array of string
+shortDescription - string 
+longDescription - string
 
+Movies: Film
+id - guid
 
+Tv Shows:
+id - guid
+shortDescription - string 
+longDescription - string
+seasons - array of season
 
+season:
+numberOfSeason - integer
+episodes - array of episodes
 
-
-
+Episode: Film
+numberOfEpisode - integer
 
 
 

@@ -47,5 +47,11 @@ namespace BlockbusterAPI.Controllers
 
             return Ok(user.AsDto());
         }
+
+        [HttpGet]
+        public async Task<IEnumerable<UserDto>> GetUsersAsync()
+        {
+            return (await repository.GetUsersAsync()).Select(user => user.AsDto());
+        }
     }
 }
