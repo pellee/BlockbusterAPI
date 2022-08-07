@@ -20,20 +20,51 @@ namespace BlockbusterAPI.Controllers
             this.repository = repository;
         }
 
-        private async Task<bool> AlreadyExistsEmailOrUsername(string email, string username)
+        private object BuildConflictError(int error)
         {
-            var existingUser = (await repository.GetUsersAsync()).FirstOrDefault(user => user.Email == email || user.Username == username);
+            if (error == 3)
+                return Conflict(new ConflictMessageErrorDto() { Message = "Username and Email already exists." });
+            else if (error == 2)
+                return Conflict(new ConflictMessageErrorDto() { Message = "Email already exists." });
 
-            if (existingUser is null)
-                return false;
-            return true;
+            return Conflict(new ConflictMessageErrorDto() { Message = "Username already exists." });
+        }
+
+        private async Task<int> AlreadyExistsEmailOrUsername(string email, string username)
+        {
+            int existsMailOrUser = -1;
+
+            var users = (await repository.GetUsersAsync());
+
+            foreach (var user in users)
+            {
+                if (user.Email == email && user.Username == username)
+                {
+                    existsMailOrUser = 3;
+                    break;
+                }
+                else if (user.Email == email && user.Username != username)
+                {
+                    existsMailOrUser = 2;
+                    break;
+                }
+                else if (user.Username == username && user.Email != email)
+                {
+                    existsMailOrUser = 1;
+                    break;
+                }
+            }
+
+            return existsMailOrUser;
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDto>> CreateUserAsync (CreateUserDto userDto)
         {
-            if (await AlreadyExistsEmailOrUsername(userDto.Email, userDto.Username))
-                return Conflict();
+            int existingUser = await AlreadyExistsEmailOrUsername(userDto.Email, userDto.Username);
+
+            if (existingUser > 0)
+                return Conflict(BuildConflictError(existingUser));
 
             User user = new()
             {
