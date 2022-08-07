@@ -53,5 +53,39 @@ namespace BlockbusterAPI.Controllers
         {
             return (await repository.GetUsersAsync()).Select(user => user.AsDto());
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUserAsync(Guid id)
+        {
+            var user = await GetUserAsync(id);
+
+            if (user is null)
+                return NotFound();
+
+            await repository.DeleteUserAsync(id);
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateUserAsync (Guid id, UpdateUserDto updateUser)
+        {
+            var existingUser = await repository.GetUserAsync(id);
+
+            if (existingUser is null)
+                return NotFound();
+
+            var user = existingUser with
+            {
+                Name = updateUser.Name,
+                LastName = updateUser.LastName,
+                Email = updateUser.Email,
+                Username = updateUser.Username
+            };
+
+            await repository.UpdateUserAsync(user);
+
+            return NoContent();
+        }
     }
 }
