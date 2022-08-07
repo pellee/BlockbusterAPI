@@ -20,9 +20,21 @@ namespace BlockbusterAPI.Controllers
             this.repository = repository;
         }
 
+        private async Task<bool> AlreadyExistsEmailOrUsername(string email, string username)
+        {
+            var existingUser = (await repository.GetUsersAsync()).FirstOrDefault(user => user.Email == email || user.Username == username);
+
+            if (existingUser is null)
+                return false;
+            return true;
+        }
+
         [HttpPost]
         public async Task<ActionResult<UserDto>> CreateUserAsync (CreateUserDto userDto)
         {
+            if (await AlreadyExistsEmailOrUsername(userDto.Email, userDto.Username))
+                return Conflict();
+
             User user = new()
             {
                 Id = Guid.NewGuid(),
