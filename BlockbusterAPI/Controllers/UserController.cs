@@ -1,5 +1,6 @@
 ﻿using BlockbusterAPI.DTOs;
 using BlockbusterAPI.Entities;
+using BlockbusterAPI.ErrorHandling;
 using BlockbusterAPI.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,16 +21,6 @@ namespace BlockbusterAPI.Controllers
         public UserController(IUserRepository repository)
         {
             this.repository = repository;
-        }
-
-        private object BuildConflictError(int error)
-        {
-            if (error == 3)
-                return Conflict(new ConflictMessageErrorDto() { Message = "Username and Email already exists." });
-            else if (error == 2)
-                return Conflict(new ConflictMessageErrorDto() { Message = "Email already exists." });
-
-            return Conflict(new ConflictMessageErrorDto() { Message = "Username already exists." });
         }
 
         private async Task<int> AlreadyExistsEmailOrUsername(string email, string username)
@@ -68,7 +59,7 @@ namespace BlockbusterAPI.Controllers
             int existingUser = await AlreadyExistsEmailOrUsername(userDto.Email, userDto.Username);
 
             if (existingUser > 0)
-                return Conflict(BuildConflictError(existingUser));
+                return Conflict(ConflictMessageHandler.BuildUserConflictError(existingUser).AsDto());
 
             User user = new()
             {

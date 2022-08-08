@@ -18,6 +18,13 @@ namespace BlockbusterAPI.DTOs
                 Username = user.Username,
                 Email = user.Email
             };
-        } 
+        }
+        public static ConflictMessageErrorDto AsDto(this ConflictMessageError error)
+        {
+            return new ConflictMessageErrorDto
+            {
+                Message = error.Message
+            };
+        }
     }
 }
